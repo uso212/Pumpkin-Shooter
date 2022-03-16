@@ -1,15 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// Manages the game state.
+/// </summary>
 public class GameSession : MonoBehaviour
 {
     public System.Action OnSessionStart;
     public System.Action OnSessionEnd;
 
-    public float timeLeft = 0;
+    public float timeLeft;
 
-    public enum SessionState
+    private enum SessionState
     {
         Paused,
         Active,
@@ -18,43 +19,34 @@ public class GameSession : MonoBehaviour
 
     private SessionState _state = SessionState.Paused;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start() => StartSession();
+
+    /// <summary>
+    /// We manage the countdown in this Update function.
+    /// </summary>
+    private void Update()
     {
-        StartSession();
+        if (_state != SessionState.Active) return;
+        
+        timeLeft -= Time.deltaTime;
+
+        if (!(timeLeft <= 0)) return;
+        timeLeft = 0;
+        EndSession();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if( _state == SessionState.Active )
-        {
-            timeLeft -= Time.deltaTime;
-            
-            if( timeLeft <= 0 )
-            {
-                timeLeft = 0;
-                EndSession();
-            }
-        }
-    }
-
-
-    void StartSession()
+    
+    /// <summary>
+    /// When we start the game
+    /// </summary>
+    private void StartSession()
     {
         _state = SessionState.Active;
-
-        if( OnSessionStart != null )
-        {
-            OnSessionStart();
-        }
+        
+        OnSessionStart?.Invoke();
     }
 
-    void EndSession()
-    {
-        if( OnSessionEnd != null )
-        {
-            OnSessionEnd();
-        }
-    }
+    /// <summary>
+    /// When we finished the game.
+    /// </summary>
+    private void EndSession() => OnSessionEnd?.Invoke();
 }

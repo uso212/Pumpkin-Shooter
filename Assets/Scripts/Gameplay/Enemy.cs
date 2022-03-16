@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// Controls the enemy (pumpkin) movement. 
+/// </summary>
 public class Enemy : MonoBehaviour
 {
     [Header("Score")]
@@ -11,35 +12,13 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float _verticalAmplitude = 2.5f;
     [SerializeField] private float _verticalFrequency = 2.5f;
 
-    [Header("Physics")]
-    [SerializeField] private Rigidbody _rigidBody = null;
-
     private Vector3 _startPosition = Vector3.zero;
-    // Start is called before the first frame update
-    void Start()
-    {
-        _startPosition = transform.position;
-    }
 
-    // Update is called once per frame
-    void Update()
+    private void Start() => _startPosition = transform.position;
+
+    private void Update()
     {
-        float positionOffset = Mathf.Sin( Time.timeSinceLevelLoad / _verticalFrequency ) * _verticalAmplitude;
+        var positionOffset = Mathf.Sin( Time.timeSinceLevelLoad / _verticalFrequency ) * _verticalAmplitude;
         transform.position = new Vector3( _startPosition.x, _startPosition.y + positionOffset, _startPosition.z );
-    }
-
-    void Die()
-    {
-        _rigidBody.useGravity = true;
-        Destroy(this);
-    }
-
-    void OnCollisionEnter( Collision collision )
-    {
-        if( collision.gameObject.GetComponent<Cannonball>() )
-        {
-            _rigidBody.AddForceAtPosition(collision.transform.forward, collision.GetContact(0).point, ForceMode.Impulse);
-            Die();
-        }
     }
 }
